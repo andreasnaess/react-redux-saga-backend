@@ -2,7 +2,7 @@ package no.computable.reactreduxsagabackend.controller
 
 import mu.KotlinLogging
 import no.computable.reactreduxsagabackend.dto.UserDTO
-import org.springframework.http.ResponseEntity
+import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
@@ -15,9 +15,13 @@ private val logger = KotlinLogging.logger {}
 class UserController(
     private val restTemplate: RestTemplate
 ) {
-    @GetMapping("/users")
-    fun users(): ResponseEntity<Array<UserDTO>> {
+    @GetMapping("/users", produces = [MediaType.APPLICATION_JSON_VALUE])
+    fun users(): List<UserDTO> {
         logger.info { "Henter brukere" }
-        return restTemplate.getForEntity("https://jsonplaceholder.typicode.com/users", Array<UserDTO>::class.java)
+        val users =
+            restTemplate.getForEntity("https://jsonplaceholder.typicode.com/users", Array<UserDTO>::class.java)
+                .body?.toList() ?: emptyList()
+        logger.info { "Response=$users" }
+        return users
     }
 }
